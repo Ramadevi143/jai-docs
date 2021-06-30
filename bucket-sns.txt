@@ -1,0 +1,23 @@
+{
+  "Id": "Policy1611890025691",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1611890023671",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:sns:ap-northeast-1:320273565068:s3event",
+      "Condition": {
+      "ArnLike": { "aws:SourceArn": "arn:aws:s3:::simplesrc" },
+      "StringEquals": { "aws:SourceAccount": "320273565068" }
+       }
+      "Principal": {
+        "AWS": [
+          "snss3"
+        ]
+      }
+    }
+  ]
+}

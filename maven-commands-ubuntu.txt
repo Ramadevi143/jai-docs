@@ -1,0 +1,83 @@
+apt-get update -y
+apt install openjdk-8-jdk
+apt install maven
+
+maven goals are called build life cycle
+
+mvn validate -- it will validate the project , it will check pom.xml
+mvn compile -- it will check resources and it create target
+mvn test -- it will test the java code
+mvn package -- it will change artifacts(jar or war)
+mvn verify -- it will analyze the artifact
+mvn install -- i will take backup and adding into .m2
+mvn clean ----it will delete  the old package ( target folder)
+mvn deploy -- deploy the artifacts
+
+output and package
+
+jar
+-----------
+mvn archetype:generate -DgroupId=com.mycomp.app -DartifactId=new -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+war
+-------
+mvn archetype:generate -DgroupId=com.jaidevops.simpleweb \
+-DartifactId=simple-webapp \
+-Dpackage=com.jaidevops.simpleweb \
+-DarchetypeArtifactId=maven-archetype-webapp \
+-Dversion=1.0-SNAPSHOT \
+-DinteractiveMode=false
+
+https://github.com/JohnathanMarkSmith/springmvc-helloworld
+
+https://access.redhat.com/documentation/en-us/red_hat_jboss_fuse/6.2.1/html/installation_on_jboss_eap/install_maven---redhat 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <groupId>com.mycomp.app</groupId>
+  <artifactId>home</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <groupId>com.mycomp.app</groupId>
+  <artifactId>new</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+
+
+
+
+
+

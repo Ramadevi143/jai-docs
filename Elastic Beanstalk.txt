@@ -1,0 +1,49 @@
+Elastic Beanstalk
+
+create new application
+
+Application info----- give application name
+
+Environment Type-----select web server and select type of application (php)
+
+Application Version--select sample application
+
+Environment info---check availability of given name
+
+Additional Resources---if you want to add external database like rds (optional)
+
+Configuration Details---select instance type and key pair
+
+Environment Tags
+
+Review Information
+
+launch and open in browser
+
+Create ec2 instance like ubuntu
+
+apt-get update -y
+
+apt-get install python-pip
+
+pip install awsebcli
+
+mkdir jaiseries
+
+cd jaiseries
+
+vi index.php
+
+<?php
+
+echo "Hi this is jai";
+
+and save it
+
+eb init -- to create local repo
+
+update region and acces key and secret key
+
+eb deploy
+
+then check in the browser

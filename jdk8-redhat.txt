@@ -1,0 +1,37 @@
+
+export M2_HOME=/opt/maven
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.272.b10-3.el8_3.x86_64
+export PATH=$PATH:$M2_HOME/bin:$JAVA_HOME/bin
+
+
+or
+
+
+$ sudo yum install java-1.8.0-openjdk-devel
+
+$ /usr/sbin/alternatives --config java
+
+$ /usr/sbin/alternatives --config javac
+
+
+
+
+
+
+
+
+
+/opt/maven
+/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-3.el8_2.x86_64
+
+
+
+/opt/maven
+
+/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el8_1.x86_64
+
+
+
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el8_1.x86_64
+export M2_HOME=/opt/maven
+export PATH=$M2_HOME/bin:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-3.el8_2.x86_64/bin:$PATH

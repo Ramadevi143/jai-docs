@@ -1,0 +1,51 @@
+yum install httpd
+
+systemctl enable httpd
+
+Steps to generate self signed SSL certificate for Apache web server
+
+cd /etc/pki/tls/certs
+
+step1: Generate private key
+
+openssl genrsa -out ca.key 2048
+
+
+step2: Generate certificate Request file (customer signed request)
+
+openssl req -utf8 -new -key ca.key -out ca.csr
+
+step3: Genearte tge self signed certificate
+
+openssl x509 -in ca.csr -req -signkey ca.key -out ca.crt -days 90
+
+
+
+ssl configuration apache web server:
+
+copy the keys in (*.key and *.crt in /etc/ssl)
+
+edit ssl.conf
+
+yum install mod_ssl -y
+
+<VirtualHost *:443>
+DocumentRoot /var/www/html
+ServerName ec2-54-159-128-215.compute-1.amazonaws.com
+SSLEngine on
+SSLCertificateFile /etc/pki/tls/certs/ca.crt
+SSLCertificateKeyFile /etc/pki/tls/certs/ca.key
+</VirtualHost>
+
+
+
+certificate authorities:
+
+comodo
+symantec
+go daddy
+globalsign
+digicert
+startcom
+entrust
+certum

@@ -1,0 +1,498 @@
+nInstall python2 in windows and linux
+
+pip install pywinrm -- control node (install pywinrm in control node to manage windows manage node)
+
+ 
+
+Windows (manage node):
+
+https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1 -- download on local 
+
+open windows power shell and execute the script:
+
+.\ConfigureRemotingForAnsible.ps1
+
+
+Linux:
+
+ssh configuration
+
+take servers 2 or more
+
+create user and password:
+
+adduser jai
+passwd jai
+
+visudo
+
+add the user in a line
+
+jai   (ALL: ALL) ALL
+
+vi /etc/ssh/sshd_config
+
+PermitRootLogin no
+PasswordAuthentication yes
+
+service sshd restart  (fo)
+
+ssh-keygen -t rsa ------on a folder
+
+ssh-copy-id jai@private IP      or        copy the *.pub in other instance *.pub
+
+
+
+
+
+
+installation
+
+ubuntu or debian
+
+$ sudo apt-get update
+$ sudo apt-get install software-properties-common
+$ sudo apt-add-repository ppa:ansible/ansible
+$ sudo apt-get update
+$ sudo apt-get install ansible
+
+
+apt install python-minimal in all servers
+
+
+Redhat or centos
+
+ git clone https://github.com/ansible/ansible.git
+$ cd ./ansible
+$ make rpm
+$ sudo rpm -Uvh ./rpm-build/ansible-*.noarch.rpm
+
+
+after installation check:
+
+
+ansible --version
+
+ansible-playbook --version
+
+ansible-galaxy --help
+
+ansible-doc -l
+
+>>>>>>>>>>>>inventory<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+create newfolder any name like newpro
+
+vi dev
+
+[loadbalancer]
+lb01
+
+[webserver]
+app01  
+app02
+
+[database]
+db01
+
+[control]
+control ansible_connection=local
+
+ansible -i dev --list-hosts all
+
+default we had cfg in /etc/ansible/ansible.cfg
+
+and if you create ansible.cfg in newpro
+
+[defaults]
+inventory = ./dev
+
+and save it
+
+now use 
+
+ansible --list-hosts all (there is no need to give -i dev)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+[win]
+172.31.36.102
+
+[win:vars]
+ansible_user=Administrator
+ansible_password=Admin12345
+ansible_connection=winrm
+ansible_winrm_server_cert_validation=ignore
+
+[control]
+control ansible_connection=local
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+ansible all -i host -m win_ping
+
+>>>>>>>>Host selection<<<<<<<<<<<<<<<<<<
+
+>>>>>>>>>>>>>>>>>>>>>>linux>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+[web]
+172.31.0.101
+
+[web:vars]
+anisble_user=jai
+ansible_sudo_pass=jai1234
+
+[control]
+control ansible_connection=local
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+ansible --list-hosts all (it will show up all)
+
+ansible --list-hosts "*" (here using parameter)
+
+ansible --list-hosts loadbalancer (it will show the load balancer only)
+
+ansible --list-hosts webserver (it will show the webserver only like app01 and app02)
+
+ansible --list-hosts "app0*" (it will show the with names also)
+
+ansible --list-hosts database:control (i will show the multiple)
+
+ansible --list-hosts webserver[0] (i will show first one)
+
+ansible --list-hosts \!control
+
+ansible -m ping all -e 'ansible_python_interpreter=/usr/bin/python'
+
+
+http://docs.ansible.com/ansible/latest/intro_patterns.html
+
+
+********************************************************************************
+
+to add inventory variable to python
+
+vi dev
+
+[loadbalancer]
+lb01
+
+[webserver]
+192.168.13.14  ansible_python_interpreter=/usr/bin/python3
+app02
+
+[database]
+db01
+
+[control]
+control ansible_connection=local
+
+
+http://docs.ansible.com/ansible/latest/intro_inventory.html
+
+
+*************************************************************************************
+
+
+Playbooks
+
+mkdir Playbooks
+
+cd playbooks
+
+vi hostname.yml
+
+---
+  - hosts: all
+    tasks:
+     - command: hostname
+
+to execute
+
+ansible-playbook  playbooks/hostname.yml
+
+packages:apt*************
+
+
+vi loadbalancer.yml
+
+
+---
+  - hosts: loadbalancer
+    become: true
+    tasks:
+      - name: install nginx
+        apt: name=nginx state=present update_cache=yes
+
+
+vi database.yml
+
+---
+ - hosts: database
+   become: true
+   tasks:
+     - name: install my-sql-server
+       apt: name=mysql-server state=present update_cache=yes
+
+
+**********packages with items****************
+
+vi webserver.yml
+
+- hosts: webserver
+   become: true
+   tasks:
+     - name: install web components
+       apt: name={{item}} state=present update_cache=yes
+       with_items:
+         - apache2
+         - libapache2-mod-wsgi
+         - python-pip
+         - python-virtualenv
+
+
+************services: service*****************
+---
+  - hosts: loadbalancer
+    become: true
+    tasks:
+      - name: install nginx
+        apt: name=nginx state=present update_cache=yes
+
+      - name: ensure nginx started
+        service: name=nginx state=started enabled=yes
+
+
+control.yml
+---
+  - hosts: control
+    become: true
+    tasks:
+      - name: install tools
+        apt: name={{item}} state=present update_cache=yes
+        with_items:
+          - curl
+
+***************stack restart**********
+
+---
+  # Bring stack down
+  - hosts: loadbalancer
+    become: true
+    tasks:
+      - service: name=nginx state=stopped
+
+  - hosts: webserver
+    become: true
+    tasks:
+      - service: name=apache2 state=stopped
+
+  #restart mysql
+  - hosts: database
+    become: true
+    tasks:
+      - service: name=mysql state=restarted
+
+  - hosts: webserver
+    become: true
+    tasks:
+      - service: name=apache2 state=started
+
+****************services: apache2_module, notify, handlers*********
+
+vi webserver.yml
+
+- hosts: webserver
+   become: true
+   tasks:
+     - name: install web components
+       apt: name={{item}} state=present update_cache=yes
+       with_items:
+         - apache2
+         - libapache2-mod-wsgi
+         - python-pip
+         - python-virtualenv
+     
+     - name: ensureapache2 started
+       service: name=apache2 state=started enabled=yes
+
+     - name: ensure mod_wsgi enabled
+       apache2_module: state=present name=wsgi-----------------adding package here
+       notify: restart apache2
+
+    handlers:
+      - name: restart apache2
+        service: name=apache2 state=restarted
+
+**********************copy********************************
+
+vi webserver.yml
+
+- hosts: webserver
+   become: true
+   tasks:
+     - name: install web components
+       apt: name={{item}} state=present update_cache=yes
+       with_items:
+         - apache2
+         - libapache2-mod-wsgi
+         - python-pip
+         - python-virtualenv
+     
+     - name: ensureapache2 started
+       service: name=apache2 state=started enabled=yes
+
+     - name: ensure mod_wsgi enabled
+       apache2_module: state=present name=wsgi
+       notify: restart apache2
+
+     - name: copy demo app source
+       copy: src=demo/app/ dest=/var/www/demo mode=755-------------adding copy here
+       notify: restart apache2
+
+     - name: copy apache virtual host config
+       copy: src=demo/demo.conf dest=/etc/apache2/sites-available mode=0755
+       notify: restart apache2
+
+    handlers:
+      - name: restart apache2
+        service: name=apache2 state=restarted
+
+
+***********************Application modules-pip**********************
+
+
+vi webserver.yml
+
+- hosts: webserver
+   become: true
+   tasks:
+     - name: install web components
+       apt: name={{item}} state=present update_cache=yes
+       with_items:
+         - apache2
+         - libapache2-mod-wsgi
+         - python-pip
+         - python-virtualenv
+     
+     - name: ensureapache2 started
+       service: name=apache2 state=started enabled=yes
+
+     - name: ensure mod_wsgi enabled
+       apache2_module: state=present name=wsgi
+       notify: restart apache2
+
+     - name: copy demo app source
+       copy: src=demo/app/ dest=/var/www/demo mode=755
+       notify: restart apache2
+
+     - name: copy apache virtual host config
+       copy: src=demo/demo.conf dest=/etc/apache2/sites-available mode=0755
+       notify: restart apache2
+
+     - name: setup python virtualenv----------------------------------------------pip
+       pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.venv
+       notify: restart apache2
+
+    handlers:
+      - name: restart apache2
+        service: name=apache2 state=restarted
+
+***********************file***************************************************
+
+
+vi webserver.yml
+
+- hosts: webserver
+   become: true
+   tasks:
+     - name: install web components
+       apt: name={{item}} state=present update_cache=yes
+       with_items:
+         - apache2
+         - libapache2-mod-wsgi
+         - python-pip
+         - python-virtualenv
+     
+     - name: ensureapache2 started
+       service: name=apache2 state=started enabled=yes
+
+     - name: ensure mod_wsgi enabled
+       apache2_module: state=present name=wsgi
+       notify: restart apache2
+
+     - name: copy demo app source
+       copy: src=demo/app/ dest=/var/www/demo mode=755
+       notify: restart apache2
+
+     - name: copy apache virtual host config
+       copy: src=demo/demo.conf dest=/etc/apache2/sites-available mode=0755
+       notify: restart apache2
+
+     - name: setup python virtualenv
+       pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.venv
+       notify: restart apache2
+
+     - name: deactivate default apache site -------------------------------------------------------file
+       file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+       notify: restart apache2
+
+     - name: activate demo apache site
+       file: src=/etc/apache2/sites-available/demo.conf dest=/etc/apache2/sites-enabled/demo.conf state=link
+       notify: restart apache2
+
+    handlers:
+      - name: restart apache2
+        service: name=apache2 state=restarted
+
+***********************************templates****************************************
+
+
+http://jinja.pocoo.org/docs/2.10/templates/
+
+***********************************************lineinfile***********
+
+if we had database yml file
+
+---
+ - hosts: database
+   become: true
+   tasks:
+     - name: install my-sql-server
+       apt: name=mysql-server state=present update_cache=yes
+     
+     - name: ensure mysql started
+       service: name=mysql state=started enabled=yes
+
+     - name: ensure mysql listening on all ports --------------lineinfile
+       lineinfile: dest=//etc/mysql/my.conf regexp=^bind-address
+           	   line="bind-address = 0.0.0.0"
+       notify: restart mysql
+    handlers:
+      - name: restart mysql
+        service: name=mysql state=restarted
+
+
+
+       
+
+ansible-playbook  playbooks/new.yaml --user=jai --extra-vars "ansible_sudo_pass=jai1234"
+
+ansible-playbook  playbooks/hostname.yml --user=jai --extra-vars "ansible_sudo_pass=jai123" -l 172.213.19.13 ---single host
+
+ansible-playbook  playbooks/hostname.yml --user=jai --extra-vars "ansible_sudo_pass=jai123" -l "172.213.19.13,172.456.23.78"
+
+
+visudo
+
+ansible  ALL=(ALL)  NOPASSWD: ALL
+ansadmin ALL=(ALL)  NOPASSWD: ALL
+
+passwd asadmin for both master and slave
+
+
+
+
+
+

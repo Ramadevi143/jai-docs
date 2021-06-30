@@ -1,0 +1,320 @@
+touch f1---create file
+
+vi f2---create a file and edit a file--   i(insert)( :wq!--save) ( :q! -- exit without save)
+ then write text + esc
+mkdir name- create a folder
+
+cd .. -- one step back from folder
+
+cd - complete back from the folder
+
+cat f2--to view content of file
+
+cp f1 f2 -- to copy from one file to another
+
+rm f1-- to remove file
+
+rm -rf f1--to remove with force reculsively
+
+umask---is the default value for every file(ls -l it will show -rw-rw-r)
+
+grep-- find the string inside the file
+
+find -- outside the file: top of the filename (find . -name "f*") or find .
+
+ps--- current terminal what process is going on
+
+ps -ef -- displays every process is going on
+
+ps -ef | grep nginx -----nginx is a one process ...it will display only one process
+
+kill -9 pid -- it will end up your process id
+
+sed-- to replace a text ina file 
+(***>sed 's/appu/jai/g' f1--it will replace all appu into jai)
+(***>sed -i 's/appu/jai/2' f1--it will replace few
+
+inode-An inode is an entry inode table,containing information (the metadata)
+      about a regular file and directory. An inode is a data structure on a 
+      traditional unix file system.such as ext3 or ext4
+
+    inode number also called as index number, it contains attributes
+how to check inode number of file
+
+    #ls -il f1
+     115921 -rw-r--r-- 1 root ***** f1
+    if you do cp or mv anything it increase i number
+                                                       HARD LINK
+
+Hard link: Hard Link acts like a mirror copy of the original file. 
+           These links share the same inodes. Changes made to the original or hard linked file will reflect in the other. 
+           When you delete Hard Link nothing will happen to the other file. Hard links can't cross file systems.
+
+
+Lets first create a "Test" directory and inside we create a new file "sample1".
+
+$ mkdir Test
+$ cd Test
+$ touch sample1
+Now, create a hard link to sample1. Name the hard link sample2.
+
+$ ln sample1 sample2
+Display inodes for both files using i argument of the ls command.
+                                                                                                                                                                            
+$ ls -il sample1 sample2
+This is what you will get as output
+
+1482256 -rw-r--r-- 2 bruno bruno 21 May 5 15:55 sample1
+1482256 -rw-r--r-- 2 bruno bruno 21 May 5 15:55 sample2
+From the output, you can notice that both sample1 and sample2 have the same inode number (1482256). Also, both files have the same file permissions and the same size.
+
+Now Remove the original sample1
+
+$ rm sample1
+After removing Hard Link just have a look at the content of the "link" sample2.
+
+$ cat sample2
+You will still be able to see the contents of the file.
+
+                                                              SOFTLINK
+SOFT LINK: Soft Link is an actual link to the original file. These Links will have a different Inodes value. Soft link points to the original file so if the original file is deleted then the soft link fails. If you delete the Soft Link, nothing will happen to file. 
+           The reason for this is, the actual file or directory’s inode is different from the "soft link" created file's inodes. Soft links can cross file systems.
+       
+        Lets create a soft link for the file sample2 using below command.
+
+$ ln -s sample2 sample3
+Display inodes for both using i argument of ls command.
+
+$ ls -il sample2 sample3
+This is what you'll get:
+
+1482256 -rw-r--r-- 1 bruno bruno 21 May 5 15:55 FileB
+1482226 lrwxrwxrwx 1 bruno bruno 5 May 5 16:22 FileC -> FileB
+From the output, you can notice that the inodes are different and the symbolic link has an "l" before the rwxrwxrwx. The permissions are different for the link and the original file because it is just a symbolic link.
+
+Now list the contents:
+
+$ cat sample2
+$ cat sample3
+Now remove the original file
+
+$ rm sample2
+And then check the Test directory:
+
+$ ls
+It will still display symbolic link sample3 but if you try to list the contents, it will tell you that there is no such file or directory.
+
+$ cat sample3
+
+chmod few more commands:
+
+chmod a-w file (removes all writing permissions)
+chmod o+x file (sets execute permissions for other (public permissions))
+chmod u=rx file        (Give the owner rx permissions, not w)
+chmod go-rwx file      (Deny rwx permission for group, others)
+chmod g+w file         (Give write permission to the group)
+chmod a+x file1 file2  (Give execute permission to everybody)
+chmod g+rx,o+x file    (OK to combine like this with a comma)
+
+u = user that owns the file
+g = group that owns the file
+o = other (everyone else)
+a = all (everybody)
+
+r = read aces to the file
+w = write access
+x = execute (run) access 
+
+AWK COMMAND:
+
+awk - Finds and Replaces text, database sort/validate/index
+
+awk command searches files for text containing a pattern. When a line or text 
+matches, awk performs a specific action on that line/text. The Program 
+statement tells awk what operation to do; Program statement consists of a 
+series of "rules" where each rule specifies one pattern to search for, and one 
+action to perform when a particular pattern is found. A regular expression 
+enclosed in slashes (/) is an awk pattern to match every input record whose 
+text belongs to that set.
+
+To print the Row Number (NR), then a dash and space ("- ") and then the first item ($1) from each line in sample.txt.
+
+First create a sample.txt file
+
+Sample Line 1
+Sample Line 2
+Sample Line 3
+$ awk '{print NR "- " $1 }' sample.txt
+1 - Sample
+2 - Sample
+3 - Sample
+
+USERS:
+
+how to add users
+
+root:
+
+adduser jai
+
+non root user:
+
+sudo adduser jai
+
+how to grant a user sudo previliges:
+
+root:
+
+visudo
+
+non root user:
+
+sudo visudo
+
+search for that looks like this
+
+root ALL=(ALL:ALL) ALL
+
+Add user name here:
+
+root ALL=(ALL:ALL) ALL
+jai  ALL=(ALL:ALL) ALL
+
+How to delete user
+
+root:
+
+deluser jai
+
+non root user:;
+
+sudo deluser jai
+
+passwords will be stored in :  /etc/passwd/
+
+how to set set password:
+
+sudo passwd jai
+
+
+create user with expiry date:
+
+sudo useradd -m -e 2017-12-30 jai
+
+vmstat:
+
+vmstat reports information about processes, memory,paging,block IO, 
+       traps, disks and cpu activity. The first report produced gives 
+       averages since the last reboot. Additional reports give information
+       on a sampling period of length delay
+
+netstat:
+
+netstat is a command-line network utility tool that displays network connections
+        for the transmission control protocol(both incoming and outgoing)
+         routing tables and a number of network interface
+
+udp(User Datagram Protocol): Both protocols send short packets of data, called datagrams.
+ 
+list all the connections tcp and udp:
+
+netstat -a | more
+
+listing tcp ports connections
+
+netstat -at
+
+listing udp ports
+
+netstat -au
+
+listing all listening connections
+
+netstat -l
+
+listing all tcp listening ports
+
+netstat -lt
+
+displaying IPv4 and IPv6
+
+netstat -g
+
+nslookup(name server lookup):
+
+nslookup (it displays server id)
+
+nslookup facebook.com
+
+20 – FTP Data (For transferring FTP data)
+
+21 – FTP Control (For starting FTP connection)
+
+22 – SSH (For secure remote administration which uses SSL to encrypt the transmission)
+
+23 – Telnet (For insecure remote administration)
+
+25 – SMTP (Mail Transfer Agent for e-mail server such as SEND mail)
+
+53 – DNS (Special service which uses both TCP and UDP)
+
+67 – Bootp
+
+68 – DHCP
+
+69 – TFTP (Trivial file transfer protocol uses udp protocol for connection less transmission of data)
+
+80 – HTTP/WWW(Apache)
+
+88 – Kerberos
+
+110 – POP3 (Mail delivery Agent)
+
+123 – NTP (Network time protocol used for time syncing uses UDP protocol)
+
+137 – NetBIOS (nmbd)
+
+139 – SMB-Samba (smbd)
+
+143 – IMAP
+
++6
++161 – SNMP (For network monitoring)
+
+389 – LDAP (For centralized administration)
+
+443 – HTTPS (HTTP+SSL for secure web access)
+
+514 – Syslogd (udp port)
+
+636 – ldaps (both ctp and udp)
+
+873 – rsync
+
+989 – FTPS-data
+
+990 – FTPS
+
+993 – IMAPS
+
+1194 – openVPN
+
+1812 – RADIUS
+
+995 – POP3s
+
+2049 – NFS (nfsd, rpc.nfsd, rpc, portmap)
+
+2401 – CVS server
+
+3306 – MySql
+
+3690 – SVN
+
+6000-6063-X11
+
+kill pid -- kill gracefully
+
+kill -9 pid - kill immediately
+
+			

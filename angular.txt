@@ -1,0 +1,90 @@
+apt-get install nodejs
+
+apt install npm
+
+npm(node package manager)
+
+npm -v
+
+nodejs -v
+
+*********************old version*************************
+
+apt install nodejs-legacy
+
+node -v
+
+v4.5
+
+*********************************************************
+
+*************new version*****************************
+
+apt-get install python-software-properties
+$ curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+
+$ sudo apt-get install nodejs
+
+node -v
+
+v8.11.2
+****************************************************
+
+to checkc the version
+
+sudo npm install -g npm@latest
+
+
+sudo npm install -g @angular/cli
+
+sudo npm install -g angular-http-server
+
+
+sudo npm install -g express
+
+create
+
+ng new application1
+
+
+cd appllication1
+
+sudo npm install -g express
+
+sudo npm i
+
+vi server.js
+
+*****************************************************************************
+const express = require('express'),
+app = express();
+
+//set our port
+const port = process.env.port || 80;
+
+app.use(express.static('dist',{redirect:false}));
+app.use('/*', express.static('dist'))
+
+app.listen(port, () => {
+    console.log('API server started on port ${port}');
+  });
+****************************************************************************
+
+sudo npm i (to create node_modules)
+
+sudo ng build
+
+sudo ng serve --host 0.0.0.0 --port 9090
+
+
+
+cd dist 
+
+sudo angular-http-server -p 9090 
+
+sudo ng test ( testing the angular code with karma)
+
+
+sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
+
+sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key

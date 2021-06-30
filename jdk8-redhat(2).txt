@@ -1,0 +1,25 @@
+
+
+$ sudo yum install java-1.8.0-openjdk-devel
+
+$ /usr/sbin/alternatives --config java
+
+$ /usr/sbin/alternatives --config javac
+
+
+
+
+
+vi ~/.bashrc
+
+export JAVA_HOME=/usr/lib/jvm/jdk1.8XXXXXXXXX
+export M2_HOME=/opt/maven
+export PATH=$PATH:/usr/lib/jvm/jdk1.8XXXXXXXXX/bin:/opt/maven/bin
+
+save it  using with :wq!
+
+
+reboot
+
+
+

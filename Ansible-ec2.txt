@@ -1,0 +1,108 @@
+# Install 
+
+apt install awscli
+apt install python-minimal
+apt install python3
+
+#install pip
+
+apt install python-pip
+apt install python3-pip
+
+pip install boto3
+pip install boto
+
+
+aws configure
+
+ACCESS_KEY=
+SECRET_access_key_id=
+
+region=
+
+**************************************************************************
+create ~.boto
+
+add 
+
+[credentials]
+
+aws_access_key_id = AKIAJLENZRTIYEPJDCQA
+aws_secret_access_key = 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
+
+[Boto]
+
+ec2_region_name= us-east-2
+
+
+and save the boto
+
+*****************************************************************************
+
+create hosts
+
+vi hosts
+
+[localhost]
+localhost ansible_connection=local
+
+****************************************************************************
+
+create ansible.cfg
+
+[defaults]
+inventory= ./hosts
+
+****************************************************************************
+
+create ec2.yml
+
+- hosts: localhost
+
+  tasks:
+
+    - name: setting up security
+      ec2_group:
+         name: jai_security
+         description: Rules Allowing Traffic on port 22 and 80
+         region: us-east-2
+         rules:
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+         rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+
+    - name: Provision a Ec2 instance
+      ec2:
+        key_name: appunew
+        region: us-east-2
+        instance_type: t2.micro
+        image: ami-5e8bb23b
+        wait: yes
+        wait_timeout: 500
+        count: 1
+        instance_tags:
+          Name: awslabserver
+          Owner: jai
+        monitoring: no
+        vpc_subnet_id: subnet-df938e92
+        assign_public_ip: yes
+        group: jai_security
+      register: ec2_out
+
+*************************************************************************************
+
+ansible-playbook ec2.yml
+
+************************************************************************************
+
+
+
+
